@@ -14,6 +14,8 @@ if __name__ == "__main__":
                         dest="stack", default="all", help="Stack to build.")
     parser.add_argument("-d", "--dry-run", action="store_true", dest="dry_run",
                         help="Print what commands will run, do not execute.")
+    parser.add_argument("--no-latest", action="store_true", dest="no_latest",
+                        help="Do not tag / push to :latest.")
 
     args = parser.parse_args()
 
@@ -52,19 +54,29 @@ if __name__ == "__main__":
     print(f"{vsep} Push Targets {vsep}")
     for s in stacks:
         for img in ("core", "crossref", "latex"):
+            pre_tag = f"pandoc/{s}"
             if img == "core":
-                tag = f"pandoc/{s}:{args.version}"
+                tag = f"{pre_tag}:{args.version}"
+                latest_tag = f"{pre_tag}:latest"
             else:
-                tag = f"pandoc/{s}-{img}:{args.version}"
+                tag = f"{pre_tag}-{img}:{args.version}"
+                latest_tag = f"{pre_tag}-{img}:latest"
 
             # https://github.com/pandoc/dockerfiles/issues/78#issuecomment-655378804
             if s == "alpine" and args.version == "2.9.2.1" and img in ("core", "latex"):
                 print(f"--> SKIPPING {tag}, must be done manually!!!")
             else:
                 maybe_run("docker", "push", tag)
+                if not args.no_latest:
+                    maybe_run("docker", "tag", tag, latest_tag)
+                    maybe_run("docker", "push", latest_tag)
                 if s == "alpine":
                     short_tag = f"pandoc/{img}:{args.version}"
                     maybe_run("docker", "tag", tag, short_tag)
                     maybe_run("docker", "push", short_tag)
+                    if not args.no_latest:
+                        latest_short_tag = f"pandoc/{img}:latest"
+                        maybe_run("docker", "tag", tag, latest_short_tag)
+                        maybe_run("docker", "push", latest_short_tag)
 
             print("")  # separate things out a little more
