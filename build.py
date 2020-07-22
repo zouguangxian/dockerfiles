@@ -51,6 +51,11 @@ if __name__ == "__main__":
         for img in ("core", "crossref", "latex"):
             maybe_run("make", f"PANDOC_VERSION={args.version}", f"{s}-{img}")
 
+    print(f"{vsep} Test Targets {vsep}")
+    for s in stacks:
+        for img in ("core", "crossref", "latex"):
+            maybe_run("make", f"PANDOC_VERSION={args.version}", f"test-{s}-{img}")
+
     print(f"{vsep} Push Targets {vsep}")
     for s in stacks:
         for img in ("core", "crossref", "latex"):
