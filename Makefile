@@ -139,6 +139,14 @@ latex: crossref
 		--tag pandoc/$(STACK)-latex:$(PANDOC_VERSION) \
 		--build-arg base_tag=$(PANDOC_VERSION) \
 		-f $(makefile_dir)/$(STACK)/latex.Dockerfile $(makefile_dir)
+# LaTeX ########################################################################
+.PHONY: cjk
+cjk:
+	docker build \
+		--tag pandoc/$(STACK)-latex-cjk:2.14.0.3 \
+		--build-arg base_tag=2.14.0.3 \
+		-f $(makefile_dir)/$(STACK)/cjk.Dockerfile $(makefile_dir)
+
 # Test #########################################################################
 .PHONY: test-core test-latex test-crossref
 test-core: IMAGE ?= pandoc/$(STACK):$(PANDOC_VERSION)
