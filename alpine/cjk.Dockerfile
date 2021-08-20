@@ -11,7 +11,9 @@ RUN tlmgr install \
         palatino mathpazo \
         ctex \
         unicode-math \
-        texliveonfly
+        texliveonfly \
+        collection-fontsrecommended \
+        latexmk
 
 RUN ln -s `kpsewhich -var-value TEXMFSYSVAR`/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf \
         && fc-cache -fsv
