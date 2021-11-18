@@ -38,33 +38,29 @@ cd "${tmpdir}"
 pandoc_constraints="\
  +embed_data_files\
  -trypandoc"
-pandoc_citeproc_constraints="\
- +embed_data_files\
- +bibutils\
- -unicode_collation\
- -test_citeproc\
- -debug"
-hslua_constraints="\
+lua_constraints="\
  +system-lua\
  +pkg-config\
  +hardcode-reg-keys"
 
-needs_pandoc_citeproc ()
+uses_hslua_2 ()
 {
     major=$(printf "%s" "$pandoc_version" | \
-            awk -F. '{ printf("%03d%03d\n", $1,$2); }')
-    test "${major}" -ge "002011"
+                awk -F. '{ printf("%03d%03d\n", $1,$2); }')
+    test "${major}" -ge "002015"
     return $?
 }
 
+if uses_hslua_2; then
+    lua_package=lua
+else
+    lua_package=hslua
+fi
+
 print_constraints_only ()
 {
-    printf "constraints: hslua %s,\n" "${hslua_constraints}"
+    printf "constraints: %s %s,\n" "${lua_package}" "${lua_constraints}"
     printf "             pandoc %s,\n" "${pandoc_constraints}"
-    if needs_pandoc_citeproc; then
-        printf "             pandoc-citeproc %s\n" \
-               "${pandoc_citeproc_constraints}"
-    fi
 }
 
 # Just write the constraints to the target file when targeting master
@@ -87,16 +83,16 @@ printf "Switching directory to %s\n" "${sourcedir}"
 cd "${sourcedir}"
 
 # Add pandoc-crossref to the project
-printf "Writing cabal.project.local\n"
-printf "\nextra-packages: pandoc-crossref\n" > cabal.project.local
+if [ -z "${WITHOUT_CROSSREF}" ]; then
+    printf "Writing cabal.project.local\n"
+    printf "\nextra-packages: pandoc-crossref\n" > cabal.project.local
+fi
 
 # create freeze file with all desired constraints
 printf "Creating freeze file...\n"
 cabal new-freeze \
       --constraint="pandoc ${pandoc_constraints}" \
-      --constraint="hslua ${hslua_constraints}" \
-      "$(needs_pandoc_citeproc &&
-        printf -- '--constraint=pandoc-citeproc %s' "${pandoc_citeproc_constraints}")"
+      --constraint="${lua_package} ${lua_constraints}"
 
 printf "Copying freeze file to %s\n" "${target_file}"
 target_dir="$(dirname "${target_file}")"
