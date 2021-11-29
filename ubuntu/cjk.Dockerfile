@@ -1,10 +1,11 @@
 ARG base_tag="edge"
-FROM pandoc/alpine-latex:${base_tag}
+FROM pandoc/ubuntu-latex:${base_tag}
 
-RUN apk --update-cache --no-cache add \
+RUN apt-get update \
+        && apt-get -y install --no-install-recommends \
         python2 \
-        font-noto font-noto-extra font-noto-cjk font-noto-cjk-extra \
-        ttf-dejavu 
+        fonts-noto fonts-noto-extra fonts-noto-cjk fonts-noto-cjk-extra \
+        && rm -rf /var/lib/apt/lists/*
 
 RUN tlmgr install \
         tex-gyre tex-gyre-math \

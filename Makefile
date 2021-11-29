@@ -133,8 +133,8 @@ latex: crossref
 .PHONY: cjk
 cjk:
 	docker build \
-		--tag pandoc/$(STACK)-latex-cjk:2.14.0.3 \
-		--build-arg base_tag=2.14.0.3 \
+		--tag pandoc/$(STACK)-latex-cjk:$(PANDOC_VERSION) \
+		--build-arg base_tag=$(PANDOC_VERSION) \
 		-f $(makefile_dir)/$(STACK)/cjk.Dockerfile $(makefile_dir)
 
 # Test #########################################################################
