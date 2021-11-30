@@ -13,8 +13,8 @@ RUN tlmgr install \
         ctex \
         unicode-math \
         texliveonfly \
-        collection-fontsrecommended \
-        latexmk
+        latexmk \
+        collection-fontsrecommended
 
 RUN ln -s `kpsewhich -var-value TEXMFSYSVAR`/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf \
         && fc-cache -fsv
